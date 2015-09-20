@@ -28,7 +28,7 @@ import org.jsoup.nodes.Document;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainActivity extends Activity {
+public class LoginActivity extends Activity {
 
     Button loginBtn;
     EditText usernameTxt;
@@ -47,7 +47,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_login);
 
         loginBtn = (Button) findViewById(R.id.login_btn);
         usernameTxt = (EditText) findViewById(R.id.username);
@@ -74,7 +74,7 @@ public class MainActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_login, menu);
         return true;
     }
 
@@ -93,51 +93,62 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void startGetImg() {
+        captchaImg.setImageBitmap(null);
+        captchaProgressBar.setVisibility(View.VISIBLE);
+        isImgLoaded = false;
+    }
+
+    private void endGetImg() {
+        captchaProgressBar.setVisibility(View.INVISIBLE);
+        isImgLoaded = true;
+    }
+
     private void getLoginPage() {
-        Log.d("Login page", "QQ");
+        startGetImg();
         StringRequest request = new StringRequest(baseUrl,
-            new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    //Log.d("Login page response", response);
-                    Document document = Jsoup.parse(response, baseUrl);
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        //Log.d("Login page response", response);
+                        Document document = Jsoup.parse(response, baseUrl);
 
-                    String fnstr = document.select("input[name=fnstr]").attr("value");
-                    String imgUrl = baseUrl + document.select("img[src^=auth_img]").attr("src");
+                        String fnstr = document.select("input[name=fnstr]").attr("value");
+                        String imgUrl = baseUrl + document.select("img[src^=auth_img]").attr("src");
 
-                    Log.d("Login page fnstr", fnstr);
-                    Log.d("Login page imgUrl", imgUrl);
+                        Log.d("Login page fnstr", fnstr);
+                        Log.d("Login page imgUrl", imgUrl);
 
-                    MainActivity.this.fnstr = fnstr;
+                        LoginActivity.this.fnstr = fnstr;
 
-                    getCaptchaImg(imgUrl);
-                }
-            },
-            new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
+                        getCaptchaImg(imgUrl);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
 
-                }
-            });
+                    }
+                });
         requestQueue.add(request);
     }
 
     private void getCaptchaImg(String url) {
         ImageRequest request = new ImageRequest(url,
-            new Response.Listener<Bitmap>() {
-                @Override
-                public void onResponse(Bitmap response) {
-                    captchaImg.setImageBitmap(Bitmap.createScaledBitmap(response, response.getWidth() * 3, response.getHeight() * 3, false));
-                    captchaProgressBar.setVisibility(View.INVISIBLE);
-                    isImgLoaded = true;
-                }
-            }, 0, 0, null,
-            new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-
-                }
-            });
+                new Response.Listener<Bitmap>() {
+                    @Override
+                    public void onResponse(Bitmap response) {
+                        captchaImg.setImageBitmap(Bitmap.createScaledBitmap(response, response.getWidth() * 3, response.getHeight() * 3, false));
+                        endGetImg();
+                    }
+                }, 0, 0, null,
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        endGetImg();
+                        Toast.makeText(LoginActivity.this, "Get Captcha Fail", Toast.LENGTH_SHORT).show();
+                    }
+                });
         requestQueue.add(request);
     }
 
@@ -155,25 +166,27 @@ public class MainActivity extends Activity {
         if (isImgLoaded) {
             startLogin();
             StringRequest request = new StringRequest(Request.Method.POST, loginUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.d("Login result", response);
-                        if (response.contains("script")) {
-                            Toast.makeText(MainActivity.this, "Login Fail", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(MainActivity.this, "Login Success", Toast.LENGTH_SHORT).show();
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Log.d("Login result", response);
+                            if (response.contains("script")) {
+                                Toast.makeText(LoginActivity.this, "Login Fail", Toast.LENGTH_SHORT).show();
+                                getLoginPage();
+                            } else {
+                                Toast.makeText(LoginActivity.this, "Login Success", Toast.LENGTH_SHORT).show();
+                            }
+                            endLogin();
                         }
-                        endLogin();
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            endLogin();
+                            Toast.makeText(LoginActivity.this, "Login Fail", Toast.LENGTH_SHORT).show();
+                            getLoginPage();
+                        }
                     }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        endLogin();
-                        Toast.makeText(MainActivity.this, "Login Fail", Toast.LENGTH_SHORT).show();
-                    }
-                }
             ) {
                 @Override
                 protected Map<String, String> getParams() throws AuthFailureError {
@@ -190,5 +203,4 @@ public class MainActivity extends Activity {
             Toast.makeText(this, "Loading Captcha", Toast.LENGTH_SHORT).show();
         }
     }
-
 }
