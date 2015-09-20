@@ -7,39 +7,58 @@
     android:id="@+id/activity_main">
 
     <EditText
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:id="@+id/username"
-        android:layout_marginTop="45dp"
         android:hint="username"
         android:layout_alignParentTop="true"
-        android:layout_alignStart="@+id/password"
-        android:layout_alignEnd="@+id/password" />
+        android:layout_centerHorizontal="true"
+        />
 
     <EditText
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:inputType="textPassword"
-        android:ems="10"
         android:id="@+id/password"
         android:hint="password"
         android:layout_below="@+id/username"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="41dp" />
+        android:layout_marginTop="25dp" />
+
+    <EditText
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/captcha"
+        android:hint="captcha"
+        android:layout_below="@+id/password"
+        android:layout_marginTop="25dp"
+        android:layout_alignLeft="@id/password" />
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/imageView"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:id="@+id/captcha_img"
+        android:layout_alignTop="@+id/captchaProgressBar"
+        android:layout_toEndOf="@+id/captcha"
+        android:layout_marginStart="26dp" />
+
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/captchaProgressBar"
+        android:layout_alignTop="@+id/captcha"
+        android:layout_alignEnd="@+id/password"
+        android:indeterminate="false" />
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:text="Login"
         android:id="@+id/login_btn"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="81dp" />
+
+
+
 </RelativeLayout>
