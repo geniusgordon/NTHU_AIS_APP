@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,7 +30,7 @@ import org.jsoup.nodes.Document;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LoginActivity extends Activity {
+public class LoginActivity extends ActionBarActivity {
 
     Button loginBtn;
     EditText usernameTxt;

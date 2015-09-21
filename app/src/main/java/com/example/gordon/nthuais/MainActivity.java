@@ -3,6 +3,7 @@ package com.example.gordon.nthuais;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,7 +17,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
-public class MainActivity extends Activity {
+public class MainActivity extends ActionBarActivity {
 
     EditText queryTxt;
     EditText courseCodeTxt;
