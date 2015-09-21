@@ -1,6 +1,7 @@
 package com.example.gordon.nthuais;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
@@ -43,7 +44,6 @@ public class LoginActivity extends Activity {
 
     String baseUrl = "https://www.ccxp.nthu.edu.tw/ccxp/INQUIRE/";
     String loginUrl = "https://www.ccxp.nthu.edu.tw/ccxp/INQUIRE/pre_select_entry.php";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -162,6 +162,27 @@ public class LoginActivity extends Activity {
         loginProgressBar.setVisibility(View.INVISIBLE);
     }
 
+    private void enterMainPage(String path, final String acixstore) {
+        StringRequest request = new StringRequest(baseUrl + path,
+            new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    Log.d("enter main page", response);
+                    Intent intent = new Intent();
+                    intent.putExtra("acixstore", acixstore);
+                    setResult(RESULT_OK, intent);
+                    finish();
+                }
+            },
+            new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                }
+            });
+        requestQueue.add(request);
+    }
+
     private void login() {
         if (isImgLoaded) {
             startLogin();
@@ -175,6 +196,9 @@ public class LoginActivity extends Activity {
                                 getLoginPage();
                             } else {
                                 Toast.makeText(LoginActivity.this, "Login Success", Toast.LENGTH_SHORT).show();
+                                String acixstore = response.split("STORE=")[1].split("&")[0];
+                                Log.d("Login Result ACIXSTORE", acixstore);
+                                enterMainPage(response.split("url=")[1].split(">")[0], acixstore);
                             }
                             endLogin();
                         }
