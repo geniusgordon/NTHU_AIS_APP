@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -39,8 +40,12 @@ public class SearchActivity extends ActionBarActivity {
     String query;
     String courseCode;
     int page;
+    int total;
+    int pageSize;
+    boolean searching;
 
-    String searchUrl = "http://nthu-course.cf/search/?q=%s&code=%s&page=%s&size=20";
+
+    String searchUrl = "http://nthu-course.cf/search/?q=%s&code=%s&page=%s&size=%s";
     String enterAddCourseUrl1 = "https://www.ccxp.nthu.edu.tw/ccxp/COURSE/JH/7/7.1/7.1.3/JH7130011.php";
     String enterAddCourseUrl2 = "https://www.ccxp.nthu.edu.tw/ccxp/COURSE/JH/7/7.1/7.1.3/JH713002.php";
     String addCourseUrl = "https://www.ccxp.nthu.edu.tw/ccxp/COURSE/JH/7/7.1/7.1.3/JH713005.php";
@@ -49,6 +54,7 @@ public class SearchActivity extends ActionBarActivity {
     ProgressBar searchProgessBar;
     ListView listView;
     SimpleAdapter adapter;
+    ArrayList<HashMap<String,String>> list;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,13 +64,67 @@ public class SearchActivity extends ActionBarActivity {
         searchProgessBar = (ProgressBar) findViewById(R.id.searchProgressBar);
         listView = (ListView) findViewById(R.id.resultListView);
 
+        initListView();
+
         Intent intent = getIntent();
         acixstore = intent.getStringExtra("acixstore");
         query = intent.getStringExtra("query");
         courseCode = intent.getStringExtra("courseCode");
+
         page = 1;
+        total = -1;
+        pageSize = 20;
+        searching = false;
+
         requestQueue = Volley.newRequestQueue(this);
         search();
+    }
+
+    private void initListView() {
+        list = new ArrayList<HashMap<String,String>>();
+        adapter = new SimpleAdapter(this,
+                list,
+                android.R.layout.simple_expandable_list_item_2,
+                new String[] { "chi_title", "no" },
+                new int[] { android.R.id.text1, android.R.id.text2 }
+        );
+
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                final HashMap<String, String> course = (HashMap) parent.getItemAtPosition(position);
+                Log.d("Item onClick", course.get("no"));
+                AlertDialog.Builder dialog = new AlertDialog.Builder(SearchActivity.this);
+                dialog.setTitle("加選");
+                dialog.setMessage("你確定要加選這門課嗎？");
+                dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        enterAddCourse(course.get("no"), 1);
+                    }
+                });
+                dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                dialog.show();
+            }
+        });
+        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                if (firstVisibleItem == totalItemCount - visibleItemCount -1)
+                    search();
+            }
+        });
     }
 
     @Override
@@ -91,21 +151,20 @@ public class SearchActivity extends ActionBarActivity {
 
     void startSearch() {
         searchProgessBar.setVisibility(View.VISIBLE);
+        searching = true;
     }
 
     void endSearch() {
         searchProgessBar.setVisibility(View.INVISIBLE);
+        searching = false;
     }
 
     private String getSearchUrl() {
-        return String.format(searchUrl, query, courseCode, page);
+        return String.format(searchUrl, query, courseCode, page, pageSize);
     }
 
-    private void buildListView(String response) {
+    private void updateListView(JSONObject result) {
         try {
-            ArrayList<HashMap<String,String>> list = new ArrayList<HashMap<String,String>>();
-
-            JSONObject result = new JSONObject(response);
             JSONArray courses = result.getJSONArray("courses");
             for (int i = 0; i < courses.length(); i++) {
                 JSONObject course = courses.getJSONObject(i);
@@ -114,43 +173,22 @@ public class SearchActivity extends ActionBarActivity {
                 item.put("no", course.getString("no"));
                 list.add(item);
             }
-            adapter = new SimpleAdapter(this,
-                    list,
-                    android.R.layout.simple_expandable_list_item_2,
-                    new String[] { "chi_title", "no" },
-                    new int[] { android.R.id.text1, android.R.id.text2 }
-                    );
-
-            listView.setAdapter(adapter);
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    final HashMap<String, String> course = (HashMap)parent.getItemAtPosition(position);
-                    Log.d("Item onClick", course.get("no"));
-                    AlertDialog.Builder dialog = new AlertDialog.Builder(SearchActivity.this);
-                    dialog.setTitle("加選");
-                    dialog.setMessage("你確定要加選這門課嗎？");
-                    dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            enterAddCourse(course.get("no"), 1);
-                        }
-                    });
-                    dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-                    dialog.show();
-                }
-            });
+            adapter.notifyDataSetChanged();
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
     private void search() {
+        if (total != -1 && page > Math.ceil((double)total/pageSize))
+            return;
+        if (searching)
+            return;
+
+        Log.d("Search total", String.valueOf(total));
+        Log.d("Search page", String.valueOf(page));
+        Log.d("Search pageSize", String.valueOf(pageSize));
+
         startSearch();
         Log.d("Search Url", getSearchUrl());
         StringRequest request = new StringRequest(getSearchUrl(),
@@ -158,7 +196,14 @@ public class SearchActivity extends ActionBarActivity {
                 @Override
                 public void onResponse(String response) {
                     Log.d("Search Result", response);
-                    buildListView(response);
+                    try {
+                        JSONObject result = new JSONObject(response);
+                        updateListView(result);
+                        total = result.getInt("total");
+                        page++;
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                     endSearch();
                 }
             },
