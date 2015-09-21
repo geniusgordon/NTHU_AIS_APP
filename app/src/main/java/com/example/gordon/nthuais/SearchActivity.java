@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SimpleAdapter;
 
 import com.android.volley.AuthFailureError;
@@ -45,6 +46,7 @@ public class SearchActivity extends ActionBarActivity {
     String addCourseUrl = "https://www.ccxp.nthu.edu.tw/ccxp/COURSE/JH/7/7.1/7.1.3/JH713005.php";
     RequestQueue requestQueue;
 
+    ProgressBar searchProgessBar;
     ListView listView;
     SimpleAdapter adapter;
 
@@ -53,6 +55,7 @@ public class SearchActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
+        searchProgessBar = (ProgressBar) findViewById(R.id.searchProgressBar);
         listView = (ListView) findViewById(R.id.resultListView);
 
         Intent intent = getIntent();
@@ -86,22 +89,12 @@ public class SearchActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void search(String query, String courseCode) {
-        Log.d("Search query", query);
-        Log.d("Search coursecode", courseCode);
-        StringRequest request = new StringRequest(String.format(searchUrl, query, courseCode),
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.d("Search result", response);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
-            }
-        });
-        requestQueue.add(request);
+    void startSearch() {
+        searchProgessBar.setVisibility(View.VISIBLE);
+    }
+
+    void endSearch() {
+        searchProgessBar.setVisibility(View.INVISIBLE);
     }
 
     private String getSearchUrl() {
@@ -158,6 +151,7 @@ public class SearchActivity extends ActionBarActivity {
     }
 
     private void search() {
+        startSearch();
         Log.d("Search Url", getSearchUrl());
         StringRequest request = new StringRequest(getSearchUrl(),
             new Response.Listener<String>() {
@@ -165,6 +159,7 @@ public class SearchActivity extends ActionBarActivity {
                 public void onResponse(String response) {
                     Log.d("Search Result", response);
                     buildListView(response);
+                    endSearch();
                 }
             },
             new Response.ErrorListener() {
