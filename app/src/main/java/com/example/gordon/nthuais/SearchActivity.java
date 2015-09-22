@@ -16,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -51,6 +52,7 @@ public class SearchActivity extends ActionBarActivity {
     String addCourseUrl = "https://www.ccxp.nthu.edu.tw/ccxp/COURSE/JH/7/7.1/7.1.3/JH713005.php";
     RequestQueue requestQueue;
 
+    TextView resultMsg;
     ProgressBar searchProgessBar;
     ListView listView;
     SimpleAdapter adapter;
@@ -61,6 +63,7 @@ public class SearchActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
+        resultMsg = (TextView) findViewById(R.id.resultMsg);
         searchProgessBar = (ProgressBar) findViewById(R.id.searchProgressBar);
         listView = (ListView) findViewById(R.id.resultListView);
 
@@ -121,7 +124,7 @@ public class SearchActivity extends ActionBarActivity {
 
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                if (firstVisibleItem == totalItemCount - visibleItemCount -1)
+                if (firstVisibleItem == totalItemCount - visibleItemCount - 1)
                     search();
             }
         });
@@ -196,11 +199,18 @@ public class SearchActivity extends ActionBarActivity {
                 @Override
                 public void onResponse(String response) {
                     Log.d("Search Result", response);
+                    if (response.equals("TMD")) {
+                        resultMsg.setText("搜尋結果過多，請加強搜尋條件。");
+                        endSearch();
+                        return;
+                    }
                     try {
                         JSONObject result = new JSONObject(response);
                         updateListView(result);
                         total = result.getInt("total");
                         page++;
+                        if (total == 0)
+                            resultMsg.setText("查無結果！請嘗試其他關鍵字。");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
