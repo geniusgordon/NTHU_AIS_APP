@@ -1,14 +1,17 @@
 package com.example.gordon.nthuais;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -61,6 +64,18 @@ public class LoginActivity extends ActionBarActivity {
         isImgLoaded = false;
 
         requestQueue = Volley.newRequestQueue(this);
+
+        captchaTxt.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (keyCode == KeyEvent.KEYCODE_ENTER && v.hasFocus()) {
+                    Log.d("Captcha Txt", "Enter");
+                    login();
+                    return true;
+                }
+                return false;
+            }
+        });
 
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -199,6 +214,9 @@ public class LoginActivity extends ActionBarActivity {
                             } else {
                                 Toast.makeText(LoginActivity.this, "Login Success", Toast.LENGTH_SHORT).show();
                                 String acixstore = response.split("STORE=")[1].split("&")[0];
+                                InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                                View view = LoginActivity.this.getCurrentFocus();
+                                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                                 Log.d("Login Result ACIXSTORE", acixstore);
                                 enterMainPage(response.split("url=")[1].split(">")[0], acixstore);
                             }
