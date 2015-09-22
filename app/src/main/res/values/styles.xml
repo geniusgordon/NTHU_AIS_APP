@@ -8,5 +8,6 @@
         <item name="colorAccent">#7C4DFF</item>
         <item name="android:textColorPrimary">#212121</item>
         <item name="android:textColorSecondary">#727272</item>
+        <item name="android:windowIsTranslucent">true</item>
     </style>
 </resources>

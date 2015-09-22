@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -37,7 +38,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SearchActivity extends ActionBarActivity {
+import me.imid.swipebacklayout.lib.SwipeBackLayout;
+import me.imid.swipebacklayout.lib.app.SwipeBackActivity;
+
+public class SearchActivity extends AppCompatSwipeBackActivity {
 
     String acixstore;
     String query;
@@ -47,12 +51,13 @@ public class SearchActivity extends ActionBarActivity {
     int pageSize;
     boolean searching;
 
-
     String searchUrl = "http://nthu-course.cf/search/?q=%s&code=%s&page=%s&size=%s";
     String enterAddCourseUrl1 = "https://www.ccxp.nthu.edu.tw/ccxp/COURSE/JH/7/7.1/7.1.3/JH7130011.php";
     String enterAddCourseUrl2 = "https://www.ccxp.nthu.edu.tw/ccxp/COURSE/JH/7/7.1/7.1.3/JH713002.php";
     String addCourseUrl = "https://www.ccxp.nthu.edu.tw/ccxp/COURSE/JH/7/7.1/7.1.3/JH713005.php";
     RequestQueue requestQueue;
+
+    SwipeBackLayout mSwipeBackLayout;
 
     Toolbar toolbar;
     TextView resultMsg;
@@ -66,9 +71,12 @@ public class SearchActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
+        mSwipeBackLayout = getSwipeBackLayout();
+        mSwipeBackLayout.setEdgeTrackingEnabled(SwipeBackLayout.EDGE_LEFT);
+        mSwipeBackLayout.setEdgeSize(500);
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
 
         resultMsg = (TextView) findViewById(R.id.resultMsg);
         searchProgessBar = (ProgressBar) findViewById(R.id.searchProgressBar);

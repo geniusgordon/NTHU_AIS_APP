@@ -28,4 +28,5 @@ dependencies {
     compile('com.mikepenz:materialdrawer:4.3.0@aar') {
         transitive = true
     }
+    compile 'me.imid.swipebacklayout.lib:library:1.0.0'
 }
