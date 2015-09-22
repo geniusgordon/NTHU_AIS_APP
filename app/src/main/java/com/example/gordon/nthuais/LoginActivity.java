@@ -171,6 +171,7 @@ public class LoginActivity extends ActionBarActivity {
                     Log.d("enter main page", response);
                     Intent intent = new Intent();
                     intent.putExtra("acixstore", acixstore);
+                    intent.putExtra("account", usernameTxt.getText().toString());
                     setResult(RESULT_OK, intent);
                     finish();
                 }

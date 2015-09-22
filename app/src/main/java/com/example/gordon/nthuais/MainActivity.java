@@ -15,7 +15,11 @@ import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     Button searchBtn;
 
     String acixstore;
+    String account;
     int LOGIN_REQUEST = 1;
 
     @Override
@@ -43,15 +48,22 @@ public class MainActivity extends AppCompatActivity {
                 .withHeaderBackground(R.drawable.account_background)
                 .build();
 
+        SecondaryDrawerItem loginItem = new SecondaryDrawerItem()
+                .withName("Login")
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int i, IDrawerItem iDrawerItem) {
+                        login();
+                        return true;
+                    }
+                });
+
         drawer = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
                 .withAccountHeader(accountHeader)
+                .addDrawerItems(loginItem)
                 .build();
-
-        accountHeader.addProfiles(
-                new ProfileDrawerItem().withName("Gordon").withIcon(R.drawable.account_icon)
-        );
 
         acixstore = null;
 
@@ -65,9 +77,17 @@ public class MainActivity extends AppCompatActivity {
                 search();
             }
         });
+    }
 
+    private void login() {
         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
         startActivityForResult(intent, LOGIN_REQUEST);
+    }
+
+    private void addAccount(String account) {
+        accountHeader.addProfiles(
+                new ProfileDrawerItem().withName(account).withIcon(R.drawable.account_icon)
+        );
     }
 
     @Override
@@ -75,7 +95,10 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == LOGIN_REQUEST) {
             if (resultCode == RESULT_OK) {
                 acixstore = data.getStringExtra("acixstore");
+                account = data.getStringExtra("account");
                 Log.d("MainActivity onResult", acixstore);
+                addAccount(account);
+                drawer.removeItemByPosition(1);
             }
         }
     }

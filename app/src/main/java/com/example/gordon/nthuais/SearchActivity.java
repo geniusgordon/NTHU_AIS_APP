@@ -17,6 +17,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -96,6 +97,10 @@ public class SearchActivity extends ActionBarActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (acixstore == null) {
+                    Toast.makeText(SearchActivity.this, "你尚未登入", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 final HashMap<String, String> course = (HashMap) parent.getItemAtPosition(position);
                 Log.d("Item onClick", course.get("no"));
                 AlertDialog.Builder dialog = new AlertDialog.Builder(SearchActivity.this);
