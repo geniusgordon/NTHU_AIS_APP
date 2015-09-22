@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -53,6 +54,7 @@ public class SearchActivity extends ActionBarActivity {
     String addCourseUrl = "https://www.ccxp.nthu.edu.tw/ccxp/COURSE/JH/7/7.1/7.1.3/JH713005.php";
     RequestQueue requestQueue;
 
+    Toolbar toolbar;
     TextView resultMsg;
     ProgressBar searchProgessBar;
     ListView listView;
@@ -64,6 +66,10 @@ public class SearchActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+
         resultMsg = (TextView) findViewById(R.id.resultMsg);
         searchProgessBar = (ProgressBar) findViewById(R.id.searchProgressBar);
         listView = (ListView) findViewById(R.id.resultListView);
@@ -74,6 +80,9 @@ public class SearchActivity extends ActionBarActivity {
         acixstore = intent.getStringExtra("acixstore");
         query = intent.getStringExtra("query");
         courseCode = intent.getStringExtra("courseCode");
+
+        String title = String.format("關鍵字: %s (%s)", query, courseCode);
+        getSupportActionBar().setTitle(title);
 
         page = 1;
         total = -1;
