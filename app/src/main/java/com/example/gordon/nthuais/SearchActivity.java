@@ -79,6 +79,7 @@ public class SearchActivity extends AppCompatSwipeBackActivity {
 
         String title = String.format("關鍵字: %s (%s)", query, courseCode);
         getSupportActionBar().setTitle(title);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         page = 1;
         total = -1;
@@ -136,6 +137,8 @@ public class SearchActivity extends AppCompatSwipeBackActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        } else if (id == android.R.id.home) {
+            finish();
         }
 
         return super.onOptionsItemSelected(item);

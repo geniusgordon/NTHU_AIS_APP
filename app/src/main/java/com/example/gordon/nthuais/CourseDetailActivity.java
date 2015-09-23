@@ -75,6 +75,7 @@ public class CourseDetailActivity extends AppCompatSwipeBackActivity {
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         ((TextView) findViewById(R.id.title)).setText(course.getNo());
 
         titleWrapper = (RelativeLayout) findViewById(R.id.toolbarTitleWrapper);
@@ -134,6 +135,8 @@ public class CourseDetailActivity extends AppCompatSwipeBackActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        } else if (id == android.R.id.home) {
+            finish();
         }
 
         return super.onOptionsItemSelected(item);
@@ -172,7 +175,8 @@ public class CourseDetailActivity extends AppCompatSwipeBackActivity {
                 public void onResponse(String response) {
                     Document document = Jsoup.parse(response);
                     String limit = document.select(limitCssSelect).text();
-                    ((TextView) findViewById(R.id.limit)).setText("限制: " + limit + "人");
+                    if (!limit.trim().equals(""))
+                        ((TextView) findViewById(R.id.limit)).setText("限制: " + limit + "人");
 
                     String syllabus = document.select(syllabusCssSelect).html();
                     TextView syllabusTxt = (TextView) findViewById(R.id.syllabus);
