@@ -1,4 +1,4 @@
-package com.example.gordon.nthuais;
+package com.example.gordon.nthuais.activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -22,6 +22,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.gordon.nthuais.R;
 import com.example.gordon.nthuais.models.Course;
 
 import org.json.JSONArray;

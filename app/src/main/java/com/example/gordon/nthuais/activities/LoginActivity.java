@@ -1,6 +1,5 @@
-package com.example.gordon.nthuais;
+package com.example.gordon.nthuais.activities;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -26,6 +25,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.gordon.nthuais.R;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

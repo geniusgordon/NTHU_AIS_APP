@@ -1,4 +1,4 @@
-package com.example.gordon.nthuais;
+package com.example.gordon.nthuais.activities;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
