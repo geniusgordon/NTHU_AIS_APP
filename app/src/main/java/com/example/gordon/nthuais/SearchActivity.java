@@ -2,6 +2,7 @@ package com.example.gordon.nthuais;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,12 +10,15 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SimpleAdapter;
@@ -52,9 +56,6 @@ public class SearchActivity extends AppCompatSwipeBackActivity {
     boolean searching;
 
     String searchUrl = "http://nthu-course.cf/search/?q=%s&code=%s&page=%s&size=%s";
-    String enterAddCourseUrl1 = "https://www.ccxp.nthu.edu.tw/ccxp/COURSE/JH/7/7.1/7.1.3/JH7130011.php";
-    String enterAddCourseUrl2 = "https://www.ccxp.nthu.edu.tw/ccxp/COURSE/JH/7/7.1/7.1.3/JH713002.php";
-    String addCourseUrl = "https://www.ccxp.nthu.edu.tw/ccxp/COURSE/JH/7/7.1/7.1.3/JH713005.php";
     RequestQueue requestQueue;
 
     SwipeBackLayout mSwipeBackLayout;
@@ -63,8 +64,8 @@ public class SearchActivity extends AppCompatSwipeBackActivity {
     TextView resultMsg;
     ProgressBar searchProgessBar;
     ListView listView;
-    SimpleAdapter adapter;
-    ArrayList<HashMap<String,String>> list;
+    SearchResultListAdapter adapter;
+    ArrayList<Course> list;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,13 +103,8 @@ public class SearchActivity extends AppCompatSwipeBackActivity {
     }
 
     private void initListView() {
-        list = new ArrayList<HashMap<String,String>>();
-        adapter = new SimpleAdapter(this,
-                list,
-                android.R.layout.simple_expandable_list_item_2,
-                new String[] { "chi_title", "no" },
-                new int[] { android.R.id.text1, android.R.id.text2 }
-        );
+        list = new ArrayList<Course>();
+        adapter = new SearchResultListAdapter(this, list);
 
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -118,24 +114,8 @@ public class SearchActivity extends AppCompatSwipeBackActivity {
                     Toast.makeText(SearchActivity.this, "你尚未登入", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                final HashMap<String, String> course = (HashMap) parent.getItemAtPosition(position);
-                Log.d("Item onClick", course.get("no"));
-                AlertDialog.Builder dialog = new AlertDialog.Builder(SearchActivity.this);
-                dialog.setTitle("加選");
-                dialog.setMessage("你確定要加選這門課嗎？");
-                dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        enterAddCourse(course.get("no"), 1);
-                    }
-                });
-                dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                dialog.show();
+                Course course = (Course) parent.getItemAtPosition(position);
+                Log.d("Item onClick", course.getNo());
             }
         });
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -192,11 +172,9 @@ public class SearchActivity extends AppCompatSwipeBackActivity {
         try {
             JSONArray courses = result.getJSONArray("courses");
             for (int i = 0; i < courses.length(); i++) {
-                JSONObject course = courses.getJSONObject(i);
-                HashMap<String, String> item = new HashMap<String,String>();
-                item.put("chi_title", course.getString("chi_title"));
-                item.put("no", course.getString("no"));
-                list.add(item);
+                JSONObject courseJSON = courses.getJSONObject(i);
+                Course course = new Course(courseJSON);
+                list.add(course);
             }
             adapter.notifyDataSetChanged();
         } catch (JSONException e) {
@@ -248,67 +226,45 @@ public class SearchActivity extends AppCompatSwipeBackActivity {
         requestQueue.add(request);
     }
 
-    private void enterAddCourse(final String courseId, final int which) {
-        String url = (which == 1) ? enterAddCourseUrl1 : enterAddCourseUrl2+"?ACIXSTORE="+acixstore;
-        StringRequest request = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.d("enter add course", String.valueOf(which));
-                        Log.d("enter add course", response);
-                        if (which == 1)
-                            enterAddCourse(courseId, 2);
-                        else
-                            addCourse(courseId);
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d("enter add course", String.valueOf(which));
-                        if (which == 1)
-                            enterAddCourse(courseId, 2);
-                        else
-                            addCourse(courseId);
-                    }
-                }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("ACIXSTORE", acixstore);
-                return params;
-            }
-        };
-        requestQueue.add(request);
+    class SearchResultListAdapter extends BaseAdapter {
+        LayoutInflater mLayoutInflater;
+        List<Course> courses;
+
+        public SearchResultListAdapter(Context context, List<Course> courses) {
+            mLayoutInflater = LayoutInflater.from(context);
+            this.courses = courses;
+        }
+
+        @Override
+        public int getCount() {
+            return courses.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return courses.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return courses.indexOf(getItem(position));
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            //if (convertView == null) {
+            Course course = (Course) getItem(position);
+            View view = mLayoutInflater.inflate(R.layout.search_result_list_layout, null);
+            String time = course.getTime();
+            time = (time.length() > 4) ? time.substring(0, 4) + "\n" + time.substring(4) : time;
+            ((TextView) view.findViewById(R.id.time)).setText(time);
+            ((TextView) view.findViewById(R.id.teacher)).setText(course.getTeacher().replace("、", "\n"));
+            ((TextView) view.findViewById(R.id.chi_title)).setText(course.getChi_title());
+            ((TextView) view.findViewById(R.id.no)).setText(course.getNo());
+            //} else {
+            //}
+            return view;
+        }
     }
 
-
-
-    private void addCourse(final String courseId) {
-        StringRequest request = new StringRequest(Request.Method.POST, addCourseUrl,
-            new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    Log.d("add course", courseId);
-                    Log.d("add course", response);
-                }
-            },
-            new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-
-                }
-        }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("ACIXSTORE", acixstore);
-                params.put("ckey", courseId);
-                params.put("chkbtn", "add");
-                params.put("auth_num", "");
-                return params;
-            }
-        };
-        requestQueue.add(request);
-    }
 }
