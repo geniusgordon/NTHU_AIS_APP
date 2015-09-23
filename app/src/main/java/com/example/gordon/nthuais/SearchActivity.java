@@ -62,7 +62,6 @@ public class SearchActivity extends AppCompatSwipeBackActivity {
 
         mSwipeBackLayout = getSwipeBackLayout();
         mSwipeBackLayout.setEdgeTrackingEnabled(SwipeBackLayout.EDGE_LEFT);
-        mSwipeBackLayout.setEdgeSize(500);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -244,7 +243,7 @@ public class SearchActivity extends AppCompatSwipeBackActivity {
             Course course = (Course) getItem(position);
             View view = mLayoutInflater.inflate(R.layout.search_result_list_layout, null);
             String time = course.getTime();
-            time = (time.length() > 4) ? time.substring(0, 4) + "\n" + time.substring(4) : time;
+            time = (time.length() > 4) ? time.substring(0, time.length()/2) + "\n" + time.substring(time.length()/2) : time;
             ((TextView) view.findViewById(R.id.time)).setText(time);
             ((TextView) view.findViewById(R.id.teacher)).setText(course.getTeacher().replace("、", "\n"));
             ((TextView) view.findViewById(R.id.chi_title)).setText(course.getChi_title());

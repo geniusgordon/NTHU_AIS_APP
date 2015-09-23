@@ -46,23 +46,187 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="1000dp"
+            android:layout_height="wrap_content"
             android:padding="20dp">
 
-            <TextView
-                android:text="AAAAAAA"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
+
+            <RelativeLayout android:id="@+id/courseHeader"
+                android:layout_width="match_parent"
+                android:paddingBottom="8dp"
+                android:layout_height="144dp">
+
+                <TextView android:id="@+id/courseChiTitle"
+                    android:text="AAAAAAAA"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="72dp"
+                    style="@style/Base.TextAppearance.AppCompat.Title"/>
+
+                <TextView android:id="@+id/courseEngTitle"
+                    android:text="aaaaaa"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="72dp"
+                    android:layout_below="@id/courseChiTitle"
+                    />
+
+                <TextView android:id="@+id/teacher"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="72dp"
+                    android:layout_below="@+id/courseEngTitle"
+                    android:text="Teacher"
+                    />
+
+                <Button android:id="@+id/addCourseBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:text="加選"
+                    android:textColor="#fff"
+                    style="@style/Base.Widget.AppCompat.Button.Colored"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    />
+
+
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"
+                android:layout_below="@+id/courseHeader"
                 />
 
+            <LinearLayout android:id="@+id/courseAttrib"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="96dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@+id/courseHeader"
+                >
+
+                <RelativeLayout
+                    android:layout_width="64dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <ImageView
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:id="@+id/creditImg"
+                        android:layout_centerHorizontal="true"
+                        android:src="@drawable/rating" />
+
+                    <TextView
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="3 學分"
+                        android:gravity="center"
+                        android:layout_alignParentBottom="true"
+                        android:id="@+id/credit" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="64dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <ImageView
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:id="@+id/limitImg"
+                        android:layout_centerHorizontal="true"
+                        android:src="@drawable/user_group" />
+
+                    <TextView
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="Limit: 30"
+                        android:gravity="center"
+                        android:layout_alignParentBottom="true"
+                        android:id="@+id/limit" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="64dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <ImageView
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:id="@+id/timeImg"
+                        android:layout_centerHorizontal="true"
+                        android:src="@drawable/clock" />
+
+                    <TextView
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="T1T2T3T4"
+                        android:gravity="center"
+                        android:layout_alignParentBottom="true"
+                        android:id="@+id/time" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="64dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <ImageView
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:id="@+id/classroomImg"
+                        android:layout_centerHorizontal="true"
+                        android:src="@drawable/classroom" />
+
+                    <TextView
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="qqqqq"
+                        android:gravity="center"
+                        android:layout_alignParentBottom="true"
+                        android:id="@+id/room" />
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"
+                android:layout_below="@+id/courseAttrib"
+                android:id="@+id/linearLayout" />
+
+            <ProgressBar
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/syllabusProgressBar"
+                android:layout_below="@+id/linearLayout"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="64dp"
+                android:indeterminate="false" />
+
             <TextView
-                android:text="AAAAAAA"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_alignParentBottom="true"
-                />
+                android:id="@+id/syllabus"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_below="@+id/linearLayout"
+                android:layout_centerHorizontal="true" />
 
         </RelativeLayout>
     </com.example.gordon.nthuais.views.ExtendedScrollView>

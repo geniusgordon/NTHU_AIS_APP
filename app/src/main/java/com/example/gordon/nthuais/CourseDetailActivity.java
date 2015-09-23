@@ -8,14 +8,19 @@ import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -27,15 +32,26 @@ import com.android.volley.toolbox.Volley;
 import com.example.gordon.nthuais.models.Course;
 import com.example.gordon.nthuais.views.ExtendedScrollView;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
 import java.util.HashMap;
 import java.util.Map;
 
-public class CourseDetailActivity extends AppCompatActivity {
+import me.imid.swipebacklayout.lib.SwipeBackLayout;
+
+public class CourseDetailActivity extends AppCompatSwipeBackActivity {
 
     String enterAddCourseUrl1 = "https://www.ccxp.nthu.edu.tw/ccxp/COURSE/JH/7/7.1/7.1.3/JH7130011.php";
     String enterAddCourseUrl2 = "https://www.ccxp.nthu.edu.tw/ccxp/COURSE/JH/7/7.1/7.1.3/JH713002.php";
     String addCourseUrl = "https://www.ccxp.nthu.edu.tw/ccxp/COURSE/JH/7/7.1/7.1.3/JH713005.php";
+    String syllabusUrl = "http://nthu-course.cf/search/syllabus/";
     RequestQueue requestQueue;
+
+    String limitCssSelect = "#syllabus > div > div:nth-child(2) > table:nth-child(1) > tbody > tr:nth-child(2) > td:nth-child(6)";
+    String syllabusCssSelect = "#syllabus > div > div > table:nth-child(4) > tbody > tr:nth-child(2) > td";
+
+    SwipeBackLayout mSwipeBackLayout;
 
     String acixstore;
     Course course;
@@ -50,13 +66,16 @@ public class CourseDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_course_detail);
         requestQueue = Volley.newRequestQueue(this);
 
+        mSwipeBackLayout = getSwipeBackLayout();
+        mSwipeBackLayout.setEdgeTrackingEnabled(SwipeBackLayout.EDGE_LEFT);
+
         Intent intent = getIntent();
         acixstore = intent.getStringExtra("acixstore");
         course = (Course) intent.getSerializableExtra("course");
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        ((TextView) findViewById(R.id.title)).setText(course.getChi_title());
+        ((TextView) findViewById(R.id.title)).setText(course.getNo());
 
         titleWrapper = (RelativeLayout) findViewById(R.id.toolbarTitleWrapper);
         scrollView = (ExtendedScrollView) findViewById(R.id.scrollView);
@@ -67,7 +86,7 @@ public class CourseDetailActivity extends AppCompatActivity {
 
                 int ScrollY = scrollView.getScrollY();
                 int newY = Math.min(ScrollY, actionBarHeight);
-                int height = actionBarHeight*2 - newY;
+                int height = actionBarHeight * 2 - newY;
 
                 Toolbar.LayoutParams layoutParams = new Toolbar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height);
                 titleWrapper.setLayoutParams(layoutParams);
@@ -75,11 +94,27 @@ public class CourseDetailActivity extends AppCompatActivity {
             }
         });
 
-/*        if (acixstore == null) {
-            Toast.makeText(SearchActivity.this, "你尚未登入", Toast.LENGTH_SHORT).show();
-            return;
-        }
-*/
+        findViewById(R.id.addCourseBtn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (acixstore == null) {
+                    Toast.makeText(CourseDetailActivity.this, "你尚未登入", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                showAddCourseAlert();
+            }
+        });
+
+                ((TextView) findViewById(R.id.courseChiTitle)).setText(course.getChi_title());
+        ((TextView) findViewById(R.id.courseEngTitle)).setText(course.getEng_title());
+        ((TextView) findViewById(R.id.teacher)).setText(course.getTeacher());
+        ((TextView) findViewById(R.id.credit)).setText(course.getCredit()+" 學分");
+        String time = course.getTime();
+        time = (time.length() > 4) ? time.substring(0, time.length()/2) + "\n" + time.substring(time.length()/2) : time;
+        ((TextView) findViewById(R.id.time)).setText(time);
+        ((TextView) findViewById(R.id.room)).setText(course.getRoom());
+
+        getSyllabus();
     }
 
     @Override
@@ -111,7 +146,7 @@ public class CourseDetailActivity extends AppCompatActivity {
         dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                enterAddCourse("", 1);
+                enterAddCourse(course.getNo(), 1);
             }
         });
         dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -121,6 +156,41 @@ public class CourseDetailActivity extends AppCompatActivity {
             }
         });
         dialog.show();
+    }
+
+    private Spanned htmlContent(String html) {
+        //String result = html.replace("<br>", "\n").replace("<pre>", "").replace("</pre>", "");
+        Spanned result = Html.fromHtml(html);
+        Log.d("html content", result.toString());
+        return result;
+    }
+
+    private void getSyllabus() {
+        StringRequest request = new StringRequest(syllabusUrl+course.getId(),
+            new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    Document document = Jsoup.parse(response);
+                    String limit = document.select(limitCssSelect).text();
+                    ((TextView) findViewById(R.id.limit)).setText("限制: " + limit + "人");
+
+                    String syllabus = document.select(syllabusCssSelect).html();
+                    TextView syllabusTxt = (TextView) findViewById(R.id.syllabus);
+                    syllabusTxt.setText(htmlContent(syllabus));
+                    syllabusTxt.setMovementMethod(LinkMovementMethod.getInstance());
+
+                    findViewById(R.id.syllabusProgressBar).setVisibility(View.INVISIBLE);
+                }
+            },
+            new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(CourseDetailActivity.this, "連線問題", Toast.LENGTH_SHORT).show();
+                    findViewById(R.id.syllabusProgressBar).setVisibility(View.INVISIBLE);
+                }
+            }
+        );
+        requestQueue.add(request);
     }
 
     private void enterAddCourse(final String courseId, final int which) {
