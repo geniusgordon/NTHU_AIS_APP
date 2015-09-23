@@ -3,11 +3,19 @@ package com.example.gordon.nthuais;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.TypedArray;
+import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -16,6 +24,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.gordon.nthuais.models.Course;
+import com.example.gordon.nthuais.views.ExtendedScrollView;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +38,11 @@ public class CourseDetailActivity extends AppCompatActivity {
     RequestQueue requestQueue;
 
     String acixstore;
-    int courseId;
+    Course course;
+
+    Toolbar toolbar;
+    ExtendedScrollView scrollView;
+    RelativeLayout titleWrapper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +52,34 @@ public class CourseDetailActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         acixstore = intent.getStringExtra("acixstore");
-        courseId = intent.getIntExtra("courseId", 0);
+        course = (Course) intent.getSerializableExtra("course");
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ((TextView) findViewById(R.id.title)).setText(course.getChi_title());
+
+        titleWrapper = (RelativeLayout) findViewById(R.id.toolbarTitleWrapper);
+        scrollView = (ExtendedScrollView) findViewById(R.id.scrollView);
+        scrollView.setOnScrollViewListener(new ExtendedScrollView.OnScrollViewListener() {
+            @Override
+            public void onScrollChanged(ExtendedScrollView v, int l, int t, int oldl, int oldt) {
+                int actionBarHeight = findViewById(R.id.title).getHeight();
+
+                int ScrollY = scrollView.getScrollY();
+                int newY = Math.min(ScrollY, actionBarHeight);
+                int height = actionBarHeight*2 - newY;
+
+                Toolbar.LayoutParams layoutParams = new Toolbar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height);
+                titleWrapper.setLayoutParams(layoutParams);
+                //Log.d("onScrollChanged", String.valueOf(height));
+            }
+        });
+
+/*        if (acixstore == null) {
+            Toast.makeText(SearchActivity.this, "你尚未登入", Toast.LENGTH_SHORT).show();
+            return;
+        }
+*/
     }
 
     @Override

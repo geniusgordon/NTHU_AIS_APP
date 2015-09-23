@@ -1,12 +1,14 @@
-package com.example.gordon.nthuais;
+package com.example.gordon.nthuais.models;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
+
 /**
  * Created by gordon on 9/23/15.
  */
-public class Course {
+public class Course implements Serializable {
     private int id;
     private String code;
     private String room;
