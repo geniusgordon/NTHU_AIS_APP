@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -35,6 +36,8 @@ import java.util.Map;
 
 public class LoginActivity extends ActionBarActivity {
 
+    ScrollView scrollView;
+
     Button loginBtn;
     EditText usernameTxt;
     EditText passwordTxt;
@@ -52,6 +55,8 @@ public class LoginActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        scrollView = (ScrollView) findViewById(R.id.scrollView);
 
         loginBtn = (Button) findViewById(R.id.login_btn);
         usernameTxt = (EditText) findViewById(R.id.username);
