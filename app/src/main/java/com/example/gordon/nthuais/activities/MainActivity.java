@@ -31,7 +31,8 @@ public class MainActivity extends AppCompatActivity {
     Button searchBtn;
 
     String acixstore;
-    String account;
+    String studentId;
+    String name;
     int LOGIN_REQUEST = 1;
 
     @Override
@@ -83,9 +84,12 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, LOGIN_REQUEST);
     }
 
-    private void addAccount(String account) {
+    private void addAccount(String name, String email) {
         accountHeader.addProfiles(
-                new ProfileDrawerItem().withName(account).withIcon(R.drawable.account_icon)
+                new ProfileDrawerItem()
+                        .withName(name)
+                        .withEmail(email)
+                        .withIcon(R.drawable.account_icon)
         );
     }
 
@@ -94,9 +98,10 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == LOGIN_REQUEST) {
             if (resultCode == RESULT_OK) {
                 acixstore = data.getStringExtra("acixstore");
-                account = data.getStringExtra("account");
+                studentId = data.getStringExtra("studentId");
+                name = data.getStringExtra("name");
                 Log.d("MainActivity onResult", acixstore);
-                addAccount(account);
+                addAccount(name, studentId);
                 drawer.removeItemByPosition(1);
             }
         }

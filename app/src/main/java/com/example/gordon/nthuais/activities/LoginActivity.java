@@ -28,11 +28,13 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.gordon.nthuais.Big5StringRequest;
 import com.example.gordon.nthuais.R;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,9 +53,12 @@ public class LoginActivity extends AppCompatActivity {
     RequestQueue requestQueue;
     boolean isImgLoaded;
     String fnstr;
+    String acixstore;
+    String name;
 
     String baseUrl = "https://www.ccxp.nthu.edu.tw/ccxp/INQUIRE/";
     String loginUrl = "https://www.ccxp.nthu.edu.tw/ccxp/INQUIRE/pre_select_entry.php";
+    String studentInfoUrl = "https://www.ccxp.nthu.edu.tw/ccxp/INQUIRE/JH/4/4.19/JH4j002.php";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,18 +81,6 @@ public class LoginActivity extends AppCompatActivity {
         isImgLoaded = false;
 
         requestQueue = Volley.newRequestQueue(this);
-
-        captchaTxt.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_ENTER && v.hasFocus()) {
-                    Log.d("Captcha Txt", "Enter");
-                    login();
-                    return true;
-                }
-                return false;
-            }
-        });
 
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -191,17 +184,46 @@ public class LoginActivity extends AppCompatActivity {
         loginProgressBar.setVisibility(View.INVISIBLE);
     }
 
-    private void enterMainPage(String path, final String acixstore) {
+    private void finishLogin() {
+        endLogin();
+        Toast.makeText(LoginActivity.this, "Login Success", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent();
+        intent.putExtra("acixstore", acixstore);
+        intent.putExtra("studentId", usernameTxt.getText().toString());
+        intent.putExtra("name", name);
+        setResult(RESULT_OK, intent);
+        finish();
+    }
+
+    private void getStudentInfo() {
+        Big5StringRequest request = new Big5StringRequest(studentInfoUrl+"?ACIXSTORE="+acixstore,
+            new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    String css = "body > div > form > table:nth-child(2) > tbody > tr:nth-child(1) > td:nth-child(4)";
+                    Log.d("Student Info", response);
+                    Document document = Jsoup.parse(response);
+                    name = document.select(css).text();
+                    finishLogin();
+                }
+            },
+            new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.d("Student Info", "error");
+                    error.printStackTrace();
+                }
+            });
+        requestQueue.add(request);
+    }
+
+    private void enterMainPage(String path) {
         StringRequest request = new StringRequest(baseUrl + path,
             new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
                     Log.d("enter main page", response);
-                    Intent intent = new Intent();
-                    intent.putExtra("acixstore", acixstore);
-                    intent.putExtra("account", usernameTxt.getText().toString());
-                    setResult(RESULT_OK, intent);
-                    finish();
+                    getStudentInfo();
                 }
             },
             new Response.ErrorListener() {
@@ -225,15 +247,13 @@ public class LoginActivity extends AppCompatActivity {
                                 Toast.makeText(LoginActivity.this, "Login Fail", Toast.LENGTH_SHORT).show();
                                 getLoginPage();
                             } else {
-                                Toast.makeText(LoginActivity.this, "Login Success", Toast.LENGTH_SHORT).show();
-                                String acixstore = response.split("STORE=")[1].split("&")[0];
+                                acixstore = response.split("STORE=")[1].split("&")[0];
                                 InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                                 View view = LoginActivity.this.getCurrentFocus();
                                 imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                                 Log.d("Login Result ACIXSTORE", acixstore);
-                                enterMainPage(response.split("url=")[1].split(">")[0], acixstore);
+                                enterMainPage(response.split("url=")[1].split(">")[0]);
                             }
-                            endLogin();
                         }
                     },
                     new Response.ErrorListener() {
@@ -260,4 +280,5 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(this, "Loading Captcha", Toast.LENGTH_SHORT).show();
         }
     }
+
 }
