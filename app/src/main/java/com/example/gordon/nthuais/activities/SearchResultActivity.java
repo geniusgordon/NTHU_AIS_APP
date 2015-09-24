@@ -34,7 +34,7 @@ import java.util.List;
 
 import me.imid.swipebacklayout.lib.SwipeBackLayout;
 
-public class SearchActivity extends AppCompatSwipeBackActivity {
+public class SearchResultActivity extends AppCompatSwipeBackActivity {
 
     String acixstore;
     String query;
@@ -59,7 +59,7 @@ public class SearchActivity extends AppCompatSwipeBackActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search);
+        setContentView(R.layout.activity_search_result);
 
         mSwipeBackLayout = getSwipeBackLayout();
         mSwipeBackLayout.setEdgeTrackingEnabled(SwipeBackLayout.EDGE_LEFT);
@@ -101,7 +101,7 @@ public class SearchActivity extends AppCompatSwipeBackActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Course course = (Course) parent.getItemAtPosition(position);
                 Log.d("Item onClick", course.getNo());
-                Intent intent = new Intent(SearchActivity.this, CourseDetailActivity.class);
+                Intent intent = new Intent(SearchResultActivity.this, CourseDetailActivity.class);
                 intent.putExtra("acixstore", acixstore);
                 intent.putExtra("course", course);
                 startActivity(intent);

@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
     private void search() {
         String query = queryTxt.getText().toString();
         String courseCode = courseCodeTxt.getText().toString();
-        Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+        Intent intent = new Intent(MainActivity.this, SearchResultActivity.class);
         intent.putExtra("acixstore", acixstore);
         intent.putExtra("query", query);
         intent.putExtra("courseCode", courseCode);
