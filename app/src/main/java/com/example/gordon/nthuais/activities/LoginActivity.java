@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -34,9 +36,10 @@ import org.jsoup.nodes.Document;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LoginActivity extends ActionBarActivity {
+public class LoginActivity extends AppCompatActivity {
 
     ScrollView scrollView;
+    Toolbar toolbar;
 
     Button loginBtn;
     EditText usernameTxt;
@@ -57,6 +60,10 @@ public class LoginActivity extends ActionBarActivity {
         setContentView(R.layout.activity_login);
 
         scrollView = (ScrollView) findViewById(R.id.scrollView);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Log In");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         loginBtn = (Button) findViewById(R.id.login_btn);
         usernameTxt = (EditText) findViewById(R.id.username);
@@ -107,8 +114,9 @@ public class LoginActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == android.R.id.home) {
+            finish();
+            overridePendingTransition(0, android.R.anim.slide_out_right);
         }
 
         return super.onOptionsItemSelected(item);
