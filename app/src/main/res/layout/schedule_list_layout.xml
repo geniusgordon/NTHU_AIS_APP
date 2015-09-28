@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="?android:attr/listPreferredItemHeightLarge"
+    android:paddingTop="2dip"
+    android:paddingBottom="2dip"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:id="@+id/course_box">
+
+    <RelativeLayout
+        android:id="@+id/cou_time"
+        android:layout_width="56dp"
+        android:layout_height="fill_parent"
+        android:padding="5dp">
+        <TextView android:id="@+id/time"
+            android:text="1"
+            android:layout_height="fill_parent"
+            android:layout_width="fill_parent"
+            android:gravity="center"
+            android:textColor="?attr/colorPrimary"
+            android:textSize="24dp"
+            android:textAlignment="center"
+            />
+    </RelativeLayout>
+    <LinearLayout android:id="@+id/list_item"
+        android:layout_toRightOf="@+id/cou_time"
+        android:layout_marginLeft="5dp"
+        android:orientation="vertical"
+        android:layout_width="360dp"
+        android:layout_height="match_parent"
+        android:padding="5dp">
+
+        <TextView android:id="@+id/chi_title"
+            android:text=""
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginRight="50dp"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textSize="24dp"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_toRightOf="@+id/list_item"
+        android:layout_marginLeft="5dp"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView android:id="@+id/teacher"
+            android:text=""
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            />
+        <TextView android:id="@+id/classroom"
+            android:text=""
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="6dp"
+            android:textSize="16dp"
+            />
+    </LinearLayout>
+
+
+
+</RelativeLayout>

@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.gordon.nthuais.R;
+import com.example.gordon.nthuais.activities.Schedule.ScheduleActivity;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -57,12 +58,22 @@ public class MainActivity extends AppCompatActivity {
                         return true;
                     }
                 });
+        SecondaryDrawerItem scheduleItem = new SecondaryDrawerItem()
+                .withName("My Schedule")
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int i, IDrawerItem iDrawerItem) {
+                        schedule();
+                        return true;
+                    }
+                });
 
         drawer = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
                 .withAccountHeader(accountHeader)
                 .addDrawerItems(loginItem)
+                .addDrawerItems(scheduleItem)
                 .build();
 
         acixstore = null;
@@ -82,6 +93,13 @@ public class MainActivity extends AppCompatActivity {
     private void login() {
         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
         startActivityForResult(intent, LOGIN_REQUEST);
+    }
+
+    private void schedule(){
+        Intent intent = new Intent(MainActivity.this, ScheduleActivity.class);
+        intent.putExtra("ACIXSTORE",acixstore);
+        intent.putExtra("stu_id",studentId);
+        startActivity(intent);
     }
 
     private void addAccount(String name, String email) {
