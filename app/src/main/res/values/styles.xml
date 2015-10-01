@@ -1,8 +1,13 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
+    <style name="AppTheme" parent="MaterialDrawerTheme.Light.DarkToolbar">
         <!-- Customize your theme here. -->
+        <item name="colorPrimaryDark">#7B1FA2</item>
+        <item name="colorPrimary">#9C27B0</item>
+        <item name="colorAccent">#7C4DFF</item>
+        <item name="android:textColorPrimary">#212121</item>
+        <item name="android:textColorSecondary">#727272</item>
+        <item name="android:windowIsTranslucent">true</item>
     </style>
-
 </resources>

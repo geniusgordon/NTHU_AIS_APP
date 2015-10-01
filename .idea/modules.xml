@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/NTHUAIS.iml" filepath="$PROJECT_DIR$/NTHUAIS.iml" />
+      <module fileurl="file://$PROJECT_DIR$/NTHU_AIS_APP.iml" filepath="$PROJECT_DIR$/NTHU_AIS_APP.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
